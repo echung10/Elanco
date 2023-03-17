@@ -1,0 +1,38 @@
+---
+- name: Cisco catalyst
+  hosts: Cisco_Switch
+  gather_facts: no
+
+  tasks:
+  - name: Catalyst switches backup
+    ios_command:
+      commands:
+      - show run
+    register: showrun
+    check_mode: no
+
+  - copy:
+       content: "{{ showrun.stdout | replace('\\n', '\n') }}"
+       dest: "backup/{{ inventory_hostname }}-conf.txt"
+
+- name: Nexus
+  hosts: Nexus_Switch
+  gather_facts: no
+
+  vars:
+    ansible_user: admin
+    ansible_ssh_pass: Lumen123!
+    ansible_connection: network_cli
+    ansible_network_os: nxos
+
+  tasks:
+  - name: Nexus switches backup 
+    nxos_command:
+      commands:
+      - show run
+    register: showrun2
+    check_mode: no
+
+  - copy:
+       content: "{{ showrun2.stdout | replace('\\n', '\n') }}"
+       dest: "backup/{{ inventory_hostname }}-conf.txt"
